@@ -66,7 +66,7 @@ gmt._namecall = newcclosure(function(self, ...)
   if tostring(self) == "HitPart" and tostring(method) == "FireServer" then
      Args[1] = getPlayerClosestToMouse()
      Args[2] = getPlayerClosestToMouse().Position
-     return self.FireServer(self, unpack(args))
+     return self.FireServer(self, unpack(Args))
   end
     return oldNameCall(self, ...)
 end)
