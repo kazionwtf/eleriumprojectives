@@ -61,11 +61,11 @@ setreadonly(gmt, false)
 local oldNameCall = gmt._namecall
 
 gmt._namecall = newcclosure(function(self, ...)
-  local args = {...}
+  local Args = {...}
   local method = getgamecallmethod()
   if tostring(self) == "HitPart" and tostring(method) == "FireServer" then
-     args[1] = getPlayerClosestToMouse()
-     args[2] = getPlayerClosestToMouse().Position
+     Args[1] = getPlayerClosestToMouse()
+     Args[2] = getPlayerClosestToMouse().Position
      return self.FireServer(self, unpack(args))
   end
     return oldNameCall(self, ...)
