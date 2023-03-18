@@ -284,54 +284,46 @@ aimbotSection:addToggle("Aimbot (Mouse2)", nil, function(v)
    end
 end)
 
-silentAimSection:addToggle("Silent Aim", nil, function(val)
-    local CurrentCamera = workspace.CurrentCamera
-    local Players = game.GetService(game, "Players")
-    local LocalPlayer = Players.LocalPlayer
-    local Mouse = LocalPlayer:GetMouse()
-    function ClosestPlayer()
-        local MaxDist, Closest = math.huge
-        for I,V in pairs(Players.GetPlayers(Players)) do
-            if V == LocalPlayer then continue end
-            if V.Team == LocalPlayer then continue end
-            if not V.Character then continue end
-            local Head = V.Character.FindFirstChild(V.Character, aimbotPart)
-            if not Head then continue end
-            local Pos, Vis = CurrentCamera.WorldToScreenPoint(CurrentCamera, Head.Position)
-            if not Vis then continue end
-            local MousePos, TheirPos = Vector2.new(Mouse.X, Mouse.Y), Vector2.new(Pos.X, Pos.Y)
-            local Dist = (TheirPos - MousePos).Magnitude
-            if Dist < MaxDist then
-                MaxDist = Dist
-                Closest = V
-                print("working")
+
+aimbotSection:addToggle("Silent Aim", nil, function(State)
+Settings.SilentAim = State
+local Players = Players
+local LocalPlayer = Player
+local Mouse = LocalPlayer:GetMouse()
+function ClosestPlayerToCurser()
+    local MaxDistance, Closest = math.huge
+    for i,v in pairs(Players.GetPlayers(Players)) do
+        if v ~= LocalPlayer and v.Team ~= LocalPlayer.Team and v.Character then
+            local H = v.Character.FindFirstChild(v.Character, "Head")
+            if H then 
+                local Pos, Vis = Workspace.CurrentCamera.WorldToScreenPoint(Workspace.CurrentCamera, H.Position)
+                if Vis then
+                    local A1, A2 = Vector2.new(Mouse.X, Mouse.Y), Vector2.new(Pos.X, Pos.Y)
+                    local Dist = (A2 - A1).Magnitude
+                    if Dist < MaxDistance and Dist <= 2500 then
+                        MaxDistance = Dist
+                        Closest = v
+                    end
+                end
             end
         end
-        return Closest
     end
-    local MT = getrawmetatable(game)
-    local OldNC = MT.__namecall
-    local OldIDX = MT.__index
-    setreadonly(MT, false)
-    MT.__namecall = newcclosure(function(self, ...)
-        local Args, Method = {...}, getnamecallmethod()
-        if Method == "FindPartOnRayWithIgnoreList" and not checkcaller() then
-            local CP = ClosestPlayer()
-            if CP and CP.Character and CP.Character.FindFirstChild(CP.Character, aimbotPart) then
-                Args[1] = Ray.new(CurrentCamera.CFrame.Position, (CP.Character.Head.Position - CurrentCamera.CFrame.Position).Unit * 1000)
-                return OldNC(self, unpack(Args))
-            end
+    return Closest
+end
+local OldNameCall = nil
+OldNameCall = hookmetamethod(game, "__namecall", function(self,...)
+    local Args = {...}
+    if getnamecallmethod() == "FindPartOnRayWithIgnoreList" and not checkcaller() and Settings.SilentAim then
+        local GivemeHead = ClosestPlayerToCurser()
+        if GivemeHead and GivemeHead.Character and GivemeHead.Character.FindFirstChild(GivemeHead.Character, aimbotPart) then
+            Args[1] = Ray.new(Workspace.CurrentCamera.CFrame.Position, (GivemeHead.Character[aimbotPart].Position - Workspace.CurrentCamera.CFrame.Position).Unit * 1000)
+            return OldNameCall(self, unpack(Args))
         end
-        return OldNC(self, ...)
-    end)
-    MT.__index = newcclosure(function(self, K)
-        if K == "Clips" then
-            return workspace.Map
-        end
-        return OldIDX(self, K)
-    end)
-    setreadonly(MT, true)
+    end
+    return OldNameCall(self, ...)
 end)
+end)
+
 
 infosecsec:addKeybind("Toggle UI Keybind", Enum.KeyCode.V, function() 
   venyx:toggle()
