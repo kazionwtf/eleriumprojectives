@@ -6,13 +6,6 @@
  |  __| | |    |  __| |  _  /  | | | |  | | |\/| |
  | |____| |____| |____| | \ \ _| |_| |__| | |  | |
  |______|______|______|_|  \_\_____|\____/|_|  |_|     
- __          __
- \ \        / /
-  \ \  /\  / / 
-   \ \/  \/ /  
-    \  /\  /   
-     \/  \/    
-           
 ]]
 
 if game.PlaceId == 286090429 then
@@ -245,6 +238,31 @@ end
 
 end)
   
+miscWeaponsSectionE:addToggle("FastFire Rate", nil, function(State)
+for _, v in pairs(ReplicatedStorage.Weapons:GetDescendants()) do
+    if v.Name == "FireRate" then
+        if State then
+            v.Value = 0.02 -- Fast Firerate
+        else
+            v.Value = 0.8
+        end
+    end
+end
+end)
+
+miscWeaponsSectionE:addToggle("Always Auto", nil, function(State)
+for _, v in pairs(ReplicatedStorage.Weapons:GetDescendants()) do
+    if v.Name == "Auto" then
+        if State then
+            v.Value = true -- always auto
+        else
+            v.Value = false
+        end
+    end
+end
+end)
+
+
 local Toggle1 = aimbotSection:addToggle("Team Check", nil, function(State)
     if State then
        tc = true
@@ -254,7 +272,24 @@ local Toggle1 = aimbotSection:addToggle("Team Check", nil, function(State)
         Settings.T.TeamCheck = false
     end
 end)
+  
+local Toggle1 = aimbotSection:addToggle("Aimbot FFA", nil, function(State)
+    if State then
+        Settings.Aimbot.FreeForAll = true
+      else
+        Settings.Aimbot.FreeForAll = false
+    end
+end)
 
+local Toggle1 = aimbotSection:addToggle("Trigger Bot", nil, function(State)
+    if State then
+       Settings.T.Enabled = true
+        Settings.T.TeamCheck = true
+      else
+        Settings.T.Enabled = false 
+        Settings.T.TeamCheck = false
+    end
+end)
 
 local infJumpButton = playerSection:addButton("Inf Jump", function()
 local UIS = game:GetService'UserInputService';
@@ -286,7 +321,6 @@ end)
 
 
 aimbotSection:addToggle("Silent Aim", nil, function(State)
-Settings.SilentAim = State
 local Players = Players
 local LocalPlayer = Player
 local Mouse = LocalPlayer:GetMouse()
@@ -313,7 +347,7 @@ end
 local OldNameCall = nil
 OldNameCall = hookmetamethod(game, "__namecall", function(self,...)
     local Args = {...}
-    if getnamecallmethod() == "FindPartOnRayWithIgnoreList" and not checkcaller() and Settings.SilentAim then
+    if getnamecallmethod() == "FindPartOnRayWithIgnoreList" and not checkcaller() and State then
         local GivemeHead = ClosestPlayerToCurser()
         if GivemeHead and GivemeHead.Character and GivemeHead.Character.FindFirstChild(GivemeHead.Character, aimbotPart) then
             Args[1] = Ray.new(Workspace.CurrentCamera.CFrame.Position, (GivemeHead.Character[aimbotPart].Position - Workspace.CurrentCamera.CFrame.Position).Unit * 1000)
@@ -324,33 +358,159 @@ OldNameCall = hookmetamethod(game, "__namecall", function(self,...)
 end)
 end)
 
+local Toggle1 = playerSection:addToggle("Anti Aim", nil, function(State)
+Settings.AntiAim = State
+spawn(
+    function()
+        while wait(1) and State do
+            getsenv(Player.PlayerGui.GUI.Client).lastlook = 10000
+            if Player.Character then
+                --remove legs
+                for _, v in pairs(Player.Character:GetChildren()) do
+                    if string.find(string.lower(v.Name), "foot") or string.find(string.lower(v.Name), "leg") then
+                        if v:IsA("BasePart") then
+                            v:Destroy()
+                        end
+                    end
+                end
+
+                if Player.Character:FindFirstChild("HeadHB") then
+                    Player.Character:FindFirstChild("HeadHB"):Destroy()
+                end
+                if Player.Character:FindFirstChild("FakeHead") then
+                    Player.Character:FindFirstChild("FakeHead"):Destroy()
+                end
+            end
+        end
+
+        local NewAnimation = Instance.new("Animation")
+        NewAnimation.AnimationId = "rbxassetid://0"
+
+        local OldNameCall = nil
+        OldNameCall =
+            hookmetamethod(
+            game,
+            "__namecall",
+            function(A, B, C, ...)
+                local Args = {...}
+                local Self = Args[1]
+                if getnamecallmethod() == "FireServer" and tostring(A) == "ControlTurn" then
+                    B = math.rad(math.random(-360, 360))
+                    C = Vector3.new(math.random(-10, 10), math.random(-10, 10), math.random(-10, 10))
+                    Player.Character.HumanoidRootPart.CFrame =
+                        CFrame.new(Player.Character.HumanoidRootPart.Position) *
+                        CFrame.Angles(0, math.rad(math.random(-360, 360)), 0)
+                elseif getnamecallmethod() == "LoadAnimation" and tostring(A) == "Humanoid" then
+                    B = NewAnimation
+                end
+                return OldNameCall(A, B, C, ...)
+            end
+        )
+        local OldNameCall = nil
+        OldNameCall =
+            hookmetamethod(
+            game,
+            "__namecall",
+            function(A, B, C, ...)
+                if tostring(A) == "Humanoid" and B == "AutoRotate" then
+                    return oldnewIndex(A, B, false)
+                end
+                return oldnewIndex(A, B, C, ...)
+            end
+        )
+    end
+)
+
+end)
+if Settings.WalkSpeed == nil or Settings.JumpPower == nil then
+Settings.WalkSpeed = 23 
+Settings.JumpPower = 5
+end  
+playerSection:addToggle("Unlock WalkSpeed", nil, function(State)
+    RunService.Stepped:connect(
+    function()
+        if State then
+            Player.Character:WaitForChild("Humanoid").WalkSpeed = Settings.WalkSpeed
+       	    if Player.Character:FindFirstChildOfClass('Humanoid').UseJumpPower then
+			Player.Character:WaitForChild('Humanoid').JumpPower = Settings.JumpPower
+		    else
+			Player.Character:WaitForChild('Humanoid').JumpHeight  = Settings.JumpPower
+			end 
+            if not  UserInputService.WindowFocusReleased then
+                pcall(function()
+                setfpscap(240)
+                end)
+            end
+        end
+    end
+)
+end)
+      
+playerSection:addSlider("Set WalkSpeed", 23, 1, 999, function(callback)
+    Settings.WalkSpeed = callback
+end)
+      
+playerSection:addSlider("Set JumpPower", 5, 1, 999, function(callback)
+    Settings.JumpPower = callback
+end)
 
 infosecsec:addKeybind("Toggle UI Keybind", Enum.KeyCode.V, function() 
   venyx:toggle()
 end, 
 function(value) toggleUIKey = value end)
 
+miscWeaponsSectionE:addToggle("No Spread", nil, function(State)
+for i, v in pairs(ReplicatedStorage.Weapons:GetDescendants()) do
+    if v.Name == "MaxSpread" or v.Name == "Spread" or v.Name == "RecoilControl" then
+        if State then
+            v.Value = 0 -- no spread or recoil
+        else
+            v.Value = 1
+        end
+    end
+end
+end)
+      
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/EleriumESP.lua"))()
 
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/1201for/V.G-Hub/main/Karrot-Esp"))()
-
-visualsSection:addToggle("Enable ESP", nil, function(State)
-   ESP:Toggle(State)
+visualsSection:addToggle("ESP Enabled", nil, function(State)
+   if State then
+    ESP:Toggle(true)
+     else
+       ESP:Toggle(false)
+   end
 end)
 
 visualsSection:addToggle("Players", nil, function(State)
-    ESP.Players = State
+    if State then
+    ESP.Players = true
+     else
+       ESP.Players = false
+   end
 end)
 
 visualsSection:addToggle("Tracers", Settings.Tracers, function(State)
-    ESP.Tracers = State
+    if State then
+    ESP.Tracers = true
+     else
+       ESP.Tracers = false
+   end
 end)
 
 visualsSection:addToggle("Names", nil, function(State)
-    Settings.EspNames = State
+   if State then
+    ESP.Names = true
+     else
+       ESP.Names = false
+   end
 end)
 
 visualsSection:addToggle("Boxes", nil, function(State)
-    ESP.Boxes = State
+    if State then
+    ESP.Boxes = true
+     else
+       ESP.Boxes = false
+   end
 end)
 
 
