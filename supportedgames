@@ -1,6 +1,7 @@
 getgenv().Games = {
     [286090429] = "https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/Arsenal.lua",
     [621129760] = "https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/KAT.lua",
+    [6284583030] = "https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/PetSimX.lua",
 }
 
 getgenv().Unknown = {
