@@ -272,7 +272,7 @@ local Toggle1 = aimbotSection:addToggle("Team Check", nil, function(State)
     end
 end)
   
-local Toggle1 = aimbotSection:addToggle("Aimbot FFA", nil, function(State)
+local Toggle1 = aimbotSection:addToggle("Aimbot For FFA Mode", nil, function(State)
     if State then
         Settings.Aimbot.FreeForAll = true
       else
@@ -568,7 +568,14 @@ visualsSection:addToggle("Display Health", nil, function(value)
    imiecredits.TextSize = 14.000
    imiecredits.TextXAlignment = Enum.TextXAlignment.Left
    imiecredits.TextYAlignment = Enum.TextYAlignment.Top
-
+					
+   
+for _, v in next, game:GetService("CoreGui"):GetChildren() do
+    if (v.Name:match("HEALTHBAAAR")) then
+        v:Destroy()
+    end
+end
+					
    if value then
      UI.Enabled = true
    else
