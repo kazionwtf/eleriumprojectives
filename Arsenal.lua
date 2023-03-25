@@ -13,7 +13,6 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Green
 local venyx = library.new("Elerium Hub V4 - Arsenal", 5013109572)
 local Client = game.Players.LocalPlayer
 local aimPage = venyx:addPage("Aimbot", 5012544693)
-local silentAimSection = aimPage:addSection("Silent Aim")
 local aimbotSection = aimPage:addSection("Aimbot")
 local miscWeaponsSection = venyx:addPage("Gun Mods", 5013109572)
 local miscWeaponsSectionE = miscWeaponsSection:addSection("Gun Mods")
@@ -38,7 +37,7 @@ local spawn = task.spawn
 local tc = false
 
 local creditsPage = venyx:addPage("Credits", 5012544693)
-local creditsSection = creditsPage:addSection("Scripting by mosafe#0001")
+local creditsSection = creditsPage:addSection("Scripting by zksg#8178")
 
 
 local Name = "Arsenal.txt"
@@ -292,6 +291,7 @@ local Toggle1 = aimbotSection:addToggle("Trigger Bot", nil, function(State)
 end)
 
 local infJumpButton = playerSection:addButton("Inf Jump", function()
+
 local UIS = game:GetService'UserInputService';
  
 _G.JumpHeight = 50;
@@ -309,9 +309,10 @@ UIS.InputBegan:connect(function(UserInput)
         end)
     end
 end)
+			
 end)
 
-aimbotSection:addToggle("Aimbot (Mouse2)", nil, function(v)
+aimbotSection:addToggle("Aimbot", nil, function(v)
    if v then
      Settings.Aimbot.Enabled = true
        else
@@ -571,13 +572,11 @@ visualsSection:addToggle("Display Health", nil, function(value)
    if value then
      UI.Enabled = true
    else
-      game.CoreGui.HEALTHBAAAR:Destroy()
-      game.CoreGui.HEATLHBAAAR:Destroy()
-     game.CoreGui.HEALTHBAAAR.HealthFrame.imiecredits.Text = " "
+      UI.Enabled = false
    end
 end)
 
-visualsSection:addToggle("Show UI", nil, function(state)
+visualsSection:addToggle("Show Statistics", nil, function(state)
    if state then
       game.Players.LocalPlayer:WaitForChild("PlayerGui").GUI.Enabled = false
    else
