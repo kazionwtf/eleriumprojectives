@@ -183,5 +183,6 @@ for _, v in pairs(Workspace:GetDescendants()) do
 end
 end)
   
-
+else
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/unsupportedgames.lua"))()
 end
