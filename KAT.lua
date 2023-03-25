@@ -723,5 +723,5 @@ end)
         
 end
   else
-    print("a") 
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/unsupportedgames.lua"))()
 end
