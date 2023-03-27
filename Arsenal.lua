@@ -272,14 +272,6 @@ local Toggle1 = aimbotSection:addToggle("Team Check", nil, function(State)
     end
 end)
   
-local Toggle1 = aimbotSection:addToggle("Aimbot For FFA Mode", nil, function(State)
-    if State then
-        Settings.Aimbot.FreeForAll = true
-      else
-        Settings.Aimbot.FreeForAll = false
-    end
-end)
-
 local Toggle1 = aimbotSection:addToggle("Trigger Bot", nil, function(State)
     if State then
        Settings.T.Enabled = true
@@ -313,11 +305,104 @@ end)
 end)
 
 aimbotSection:addToggle("Aimbot", nil, function(v)
-   if v then
-     Settings.Aimbot.Enabled = true
-       else
-         Settings.Aimbot.Enabled = false   
-   end
+      local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
+    local GuiService = game:GetService("GuiService")
+    local LocalPlayer = Players.LocalPlayer
+    local Mouse = LocalPlayer:GetMouse()
+    local Camera = workspace.CurrentCamera
+    local sc = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    
+    local Down = true
+    local Inset = GuiService:GetGuiInset()
+    
+    --// Options \\--
+       Options = {
+        Enabled = aimbot,
+        TeamCheck = true,
+        Triggerbot = true,
+        Smoothness = true,
+        AimPart = "Head",
+        FOV = 150
+	}
+	getgenv().Options = Options
+    --// Functions \\--
+    local gc = function()
+        local nearest = math.huge
+        local nearplr
+        for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v ~= game:GetService("Players").LocalPlayer and v.Character and v.Character:FindFirstChild(Options.AimPart) then
+                if Options.TeamCheck then
+                    if game:GetService("Players").LocalPlayer.Team ~= v.Team then
+                        local pos = Camera:WorldToScreenPoint(v.Character[Options.AimPart].Position)
+                        local diff = math.sqrt((pos.X - sc.X) ^ 2 + (pos.Y + Inset.Y - sc.Y) ^ 2)
+                        if diff < nearest and diff < Options.FOV then
+                            nearest = diff
+                            nearplr = v
+                        end
+                    end
+                else
+                    local pos = Camera:WorldToScreenPoint(v.Character[Options.AimPart].Position)
+                    local diff = math.sqrt((pos.X - sc.X) ^ 2 + (pos.Y + Inset.Y - sc.Y) ^ 2)
+                    if diff < nearest and diff < Options.FOV then
+                        nearest = diff
+                        nearplr = v
+                    end
+                end
+            end
+        end
+        return nearplr
+    end -- google chrome made this but i modified it for it to use teamcheck
+    
+    function Circle()
+        local circ = Drawing.new('Circle')
+        circ.Transparency = 1
+        circ.Thickness = 1.5
+        circ.Visible = false
+        circ.Color = Color3.fromRGB(255,255,255)
+        circ.Filled = false
+        circ.NumSides = 150
+        circ.Radius = Options.FOV
+        return circ
+    end
+    curc = Circle()
+    --// Main \\--
+    UserInputService.InputBegan:Connect(function( input )
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            Down = true
+        end
+    end)
+    UserInputService.InputEnded:Connect(function( input )
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            Down = false
+        end
+    end)
+    RunService.RenderStepped:Connect(function( ... )
+        if Options.Enabled then
+            if Down then
+                if gc() ~= nil and gc().Character:FindFirstChild(Options.AimPart) then
+                    if Options.Smoothness then
+                        pcall(function( ... )
+                            local Info = TweenInfo.new(0.05,Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
+                            game:GetService("TweenService"):Create(Camera,Info,{
+                                CFrame = CFrame.new(Camera.CFrame.p,gc().Character[Options.AimPart].CFrame.p)
+                            }):Play()
+                        end)
+                    else
+                        pcall(function()
+                            Camera.CFrame = CFrame.new(Camera.CFrame.p,gc().Character[Options.AimPart].CFrame.p)
+                        end)
+                    end
+                end
+            end
+            curc.Visible = false
+            curc.Position = Vector2.new(Mouse.X, Mouse.Y+Inset.Y)
+        else
+            -- do nothing except remove the fov
+            curc.Visible = false
+        end
+    end)
 end)
 
 
@@ -771,9 +856,11 @@ local ToggleAAAOOO = playerSection:addToggle("N To Noclip", nil, function(State)
 
     aimbotSection:addDropdown("Aim Part", {"Head", "Torso"}, function(value)
         if value == "Torso" then
-            aimbotPart = "HumanoidRootPart"
+            getgenv().Options.AimPart = "HumanoidRootPart"
+	    aimbotPart = "HumanoidRootPart"
         else
-            aimbotPart = "Head"
+            getgenv().Options.AimPart = "Head"
+	    aimbotPart = "Head"
         end
     end)
   else
