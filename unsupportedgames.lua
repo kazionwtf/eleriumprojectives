@@ -1,4 +1,5 @@
 
+
 --[[
   ______ _      ______ _____  _____ _    _ __  __ 
  |  ____| |    |  ____|  __ \|_   _| |  | |  \/  | 
@@ -11,11 +12,6 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
 local venyx = library.new("Elerium Hub V4 - Unsupported Game", 5013109572)
 local Client = game.Players.LocalPlayer
-local aimPage = venyx:addPage("Aimbot", 5012544693)
-local aimbotSection = aimPage:addSection("Aimbot")
-local miscWeaponsSection = venyx:addPage("Gun Mods", 5013109572)
-local miscWeaponsSectionE = miscWeaponsSection:addSection("Gun Mods")
-
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -26,7 +22,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local wait = task.wait 
 local spawn = task.spawn 
 
-local creditsPage = venyx:addPage("Supported Games", 5012544693)
+local creditsPage = venyx:addPage("Hub", 5012544693)
 local creditsSection = creditsPage:addSection("Supported Games")
 creditsSection:addButton("Murder Mystery 2", function()
   
@@ -38,7 +34,7 @@ end)
 
 creditsSection:addButton("Arsenal", function()
     
-end
+end)
   
 creditsSection:addButton("Pet Simulator X", function()
       
