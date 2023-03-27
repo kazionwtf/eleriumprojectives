@@ -1,10 +1,10 @@
 if game.PlaceId == 6284583030 then
-local Players = Get.Players
-local Workspace = Get.Workspace
-local RunService = Get.RunService
-local ReplicatedStorage = Get.ReplicatedStorage
-local HttpService = Get.HttpService
-local RunService = Get.RunService
+local Players = gane.Players
+local Workspace = game.Workspace
+local RunService = game.RunService
+local ReplicatedStorage = game.ReplicatedStorage
+local HttpService = game.HttpService
+local RunService = game.RunService
 local Player = Players.LocalPlayer
 local Coins = Workspace["__THINGS"].Coins
 local wait = task.wait 
@@ -148,7 +148,7 @@ Section1:addToggle("Players", nil, function(State)
    end
 end)
 
-Section1:addToggle("Tracers", Settings.Tracers, function(State)
+Section1:addToggle("Tracers", nil, function(State)
     if State then
     ESP.Tracers = true
      else
