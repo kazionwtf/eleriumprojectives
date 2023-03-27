@@ -1,5 +1,5 @@
 if game.PlaceId == 6284583030 then
-local Players = gane.Players
+local Players = game.Players
 local Workspace = game.Workspace
 local RunService = game.RunService
 local ReplicatedStorage = game.ReplicatedStorage
