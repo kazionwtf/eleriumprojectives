@@ -88,6 +88,8 @@ local queue_on_teleport =
 for i, v in pairs(Games) do
     if i == game.PlaceId then
         loadstring(game:HttpGet(v))()
+    else
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/kazionwtf/eleriumprojectives/main/unsupportedgames.lua"))()
     end
 end
 
