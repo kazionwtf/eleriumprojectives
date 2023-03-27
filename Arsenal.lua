@@ -304,7 +304,7 @@ end)
 			
 end)
 
-aimbotSection:addToggle("Aimbot", nil, function(v)
+aimbotSection:addButton("Aimbot", function()
       local Players = game:GetService("Players")
     local RunService = game:GetService("RunService")
     local UserInputService = game:GetService("UserInputService")
